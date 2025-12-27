@@ -1,5 +1,8 @@
 {
   "name": "@qordinate-ai/app",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.1.0",
   "description": "Qordinate App SDK - authentication and authorization for MCP apps",
   "type": "module",
