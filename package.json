@@ -3,7 +3,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Qordinate App SDK - authentication and authorization for MCP apps",
   "type": "module",
   "main": "./dist/index.js",
