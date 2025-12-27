@@ -46,6 +46,16 @@ export interface VerifyOptions {
 const ALLOWED_ALGS = ["RS256", "ES256"] as const;
 const E164_REGEX = /^\+[1-9]\d{1,14}$/;
 
+export function parseAuthorizationHeader(authHeader: string | null | undefined): string {
+  if (!authHeader) throw new AuthError(401, "token_missing", "Authorization header missing");
+  const value = authHeader.trim();
+  if (!value) throw new AuthError(401, "invalid_authorization_header", "Authorization header must include token");
+  const bearer = /^Bearer\s+(.+)$/i.exec(value);
+  const token = bearer ? bearer[1] : value;
+  if (/\s/.test(token)) throw new AuthError(401, "invalid_authorization_header", "Authorization header must include token");
+  return token;
+}
+
 export class Authenticator {
   private readonly jwks: JwksManager;
   private readonly replayStore?: ReplayStore;
@@ -70,10 +80,7 @@ export class Authenticator {
   }
 
   async verifyAuthorizationHeader(authHeader: string | null | undefined, options?: VerifyOptions): Promise<AuthContext> {
-    if (!authHeader) throw new AuthError(401, "token_missing", "Authorization header missing");
-    const match = /^Bearer\s+(.+)$/i.exec(authHeader.trim());
-    if (!match) throw new AuthError(401, "invalid_authorization_header", "Authorization header must be Bearer token");
-    const token = match[1];
+    const token = parseAuthorizationHeader(authHeader);
     return this.verifyToken(token, options?.requiredTools ?? [], options?.includeRawClaims ?? false);
   }
 

@@ -4,6 +4,7 @@ import { createServer } from "node:http";
 import test from "node:test";
 import { SignJWT, createLocalJWKSet, exportJWK, generateKeyPair } from "jose";
 import { Authenticator, AuthError, InMemoryReplayStore } from "../dist/index.js";
+import { parseAuthorizationHeader } from "../dist/auth.js";
 
 const APP_SLUG = "app-under-test";
 const HOSTED_JWKS_URL = "https://auth.qordinate.ai/.well-known/jwks.json";
@@ -93,9 +94,23 @@ test("rejects malformed authorization headers", async () => {
   const authenticator = makeAuthenticator();
   await assert.rejects(() => authenticator.verifyAuthorizationHeader(null), (err) => err.code === "token_missing");
   await assert.rejects(
+    () => authenticator.verifyAuthorizationHeader("   "),
+    (err) => err.code === "invalid_authorization_header"
+  );
+  await assert.rejects(
     () => authenticator.verifyAuthorizationHeader("Token abc"),
     (err) => err.code === "invalid_authorization_header"
   );
+  const token = await signToken(key.privateKey, key.kid, server.issuer);
+  await assert.doesNotReject(() => authenticator.verifyAuthorizationHeader(token));
+});
+
+test("parseAuthorizationHeader handles bearer and raw tokens", () => {
+  const token = "abc123";
+  assert.equal(parseAuthorizationHeader(`Bearer ${token}`), token);
+  assert.equal(parseAuthorizationHeader(token), token);
+  assert.throws(() => parseAuthorizationHeader("  "), (err) => err.code === "invalid_authorization_header");
+  assert.throws(() => parseAuthorizationHeader("Token abc"), (err) => err.code === "invalid_authorization_header");
 });
 
 test("requires requested tools to be present", async () => {

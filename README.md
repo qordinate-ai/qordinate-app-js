@@ -18,36 +18,23 @@ Verify Qordinate-issued tokens before allowing your app to act.
 import { Authenticator, InMemoryReplayStore } from "@qordinate-ai/app/auth";
 
 const authenticator = new Authenticator({
-  appSlug: "your-app-slug",
-  issuer: "https://auth.qordinate.ai",          // default if omitted
+  appSlug: "your-app-slug",                     // required, must match the token audience
+  issuer: "https://auth.qordinate.ai",          // default if omitted, drives the JWKS resolution
   replayStore: new InMemoryReplayStore(),       // optional but recommended
-  enableReplayProtection: true                  // defaults to false
+  enableReplayProtection: true                  // defaults to false, enable to enforce single-use tokens.
 });
 
 const context = await authenticator.verifyAuthorizationHeader(
   req.headers.authorization,
   {
-    requiredTools: ["calendar.create_event"],
-    includeRawClaims: false
+    requiredTools: ["calendar.create_event"],   // ensure token has access to the requested tool
+    includeRawClaims: false                    
   }
 );
+
+// If you already have the raw JWT string, call verifyToken directly.
+const ctx = await authenticator.verifyToken(token, ["calendar.create_event"], true);
 ```
-
-- `appSlug` is required and must match the token audience.
-- `issuer` defaults to `https://auth.qordinate.ai` and drives JWKS resolution.
-- `requiredTools` ensures requested tool access is present in `mcp.tools`.
-- Provide a `replayStore` and set `enableReplayProtection` to enforce single-use tokens.
-
-`verifyAuthorizationHeader` enforces:
-
-- Bearer header presence and format
-- RS256/ES256 signature via JWKS (`https://auth.qordinate.ai/.well-known/jwks.json` by default)
-- Issuer and audience (app slug)
-- Claim shape: sub (E.164), qid, exp, iat, jti, actor, initiated_via, optional autonomous
-- Tool permissions (`mcp.tools`) against your declared `requiredTools`
-- Single-use tokens via replay store when enabled (409 on reuse)
-
-Use `verifyToken(token, options)` when you already extracted the JWT string.
 
 ## Modules
 
@@ -79,5 +66,3 @@ Failures throw `AuthError` with `status` and `code`:
 409 replay_detected
 500 server_error
 ```
-
-Messages avoid leaking token content.
