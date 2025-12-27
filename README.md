@@ -5,7 +5,7 @@ Authentication and authorization helper for MCP apps using Qordinate-issued JWTs
 ## Install
 
 ```sh
-npm install qordinate-app-sdk
+npm install @qordinate-ai/app
 ```
 
 Requires Node 18+ (global `fetch`) and ES modules.
@@ -13,12 +13,12 @@ Requires Node 18+ (global `fetch`) and ES modules.
 ## Quick start
 
 ```ts
-import { Authenticator, InMemoryReplayStore } from "qordinate-app-sdk/auth";
-// or: import { Authenticator, InMemoryReplayStore } from "qordinate-app-sdk";
+import { Authenticator, InMemoryReplayStore } from "@qordinate-ai/app/auth";
+// or: import { Authenticator, InMemoryReplayStore } from "@qordinate-ai/app";
 
 const authenticator = new Authenticator({
   appSlug: "your-app-slug",
-  // issuer defaults to https://auth.qordinate.com
+  // issuer defaults to https://auth.qordinate.ai
   replayStore: new InMemoryReplayStore(),
   enableReplayProtection: true, // Defaults to false.
 });
@@ -48,8 +48,8 @@ Use `verifyToken(token, options)` when you already extracted the JWT string.
 
 ## Modules
 
-- `auth` module exported as `import { Authenticator } from "qordinate-app-sdk/auth"`.
-- Future modules will get their own subpaths (e.g., `qordinate-app-sdk/<module>`).
+- `auth` module exported as `import { Authenticator } from "@qordinate/app-sdk/auth"`.
+- Future modules will get their own subpaths (e.g., `@qordinate/app-sdk/<module>`).
 
 ## Replay protection
 

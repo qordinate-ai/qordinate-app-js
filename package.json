@@ -1,5 +1,5 @@
 {
-  "name": "qordinate-app-sdk",
+  "name": "@qordinate-ai/app",
   "version": "0.1.0",
   "description": "Qordinate App SDK - authentication and authorization for MCP apps",
   "type": "module",
