@@ -2,6 +2,8 @@
 
 Authentication and authorization helper for MCP apps using Qordinate-issued JWTs.
 
+NPM Package - https://www.npmjs.com/package/@qordinate-ai/app
+
 ## Install
 
 ```sh
